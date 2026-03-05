@@ -6,7 +6,7 @@ const Navbar = () => {
 
       {/* Logo */}
       <div className="flex-1">
-        <a className="text-xl font-bold text-gray-800 dark:text-white">
+        <a className="text-xl font-bold text-gray-800 dark:text-white cursor-pointer">
           CS – Ticket System
         </a>
       </div>
