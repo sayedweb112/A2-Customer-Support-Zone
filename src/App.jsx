@@ -9,6 +9,7 @@ function App() {
      {/* Navbar */}
       <Navbar />
     
+    <Banner inProgress={inProgressCount} resolved={resolvedCount} />
 
        {/* Footer */}
       <Footer />
