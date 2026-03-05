@@ -9,6 +9,9 @@ function App() {
      {/* Navbar */}
       <Navbar />
     
+
+       {/* Footer */}
+      <Footer />
     </>
   )
 }
