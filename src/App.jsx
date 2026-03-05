@@ -1,20 +1,74 @@
-import './App.css'
+// src/App.jsx
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Banner from './components/Banner';
-import Footer from './components/Footer';
 import TicketCard from './components/TicketCard';
+import TaskCard from './components/TaskCard';
+import ResolvedCard from './components/ResolvedCard';
+import Footer from './components/Footer';
+
+
 function App() {
-  
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/data/tickets.json')
+      .then((response) => {
+        if (!response.ok) throw new Error('Failed to load tickets');
+        return response.json();
+      })
+      .then((data) => {
+        setTickets(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error loading tickets:', error);
+        toast.error('Could not load tickets. Using fallback data.');
+        setTickets([
+          { id: 9999, title: "Demo Ticket", description: "...", customer: "Demo", priority: "LOW PRIORITY", status: "open", createdAt: "Today" }
+        ]);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  const inProgressCount = tickets.filter(t => t.status === 'in-progress').length;
+  const resolvedCount   = tickets.filter(t => t.status === 'resolved').length;
+
+  const handleAddToTask = (id) => {
+    const ticket = tickets.find(t => t.id === id);
+    if (!ticket || ticket.status !== 'open') return;
+
+    setTickets(prev =>
+      prev.map(t => t.id === id ? { ...t, status: 'in-progress' } : t)
+    );
+    toast.success('Ticket moved to In-Progress!');
+  };
+
+  const handleComplete = (id) => {
+    setTickets(prev =>
+      prev.map(t => t.id === id ? { ...t, status: 'resolved' } : t)
+    );
+    toast.success('Ticket resolved!');
+  };
 
   return (
-    <>
-  
-     {/* Navbar */}
+    <div className="min-h-screen bg-base-100 text-base-content relative">
+      
+      {/* Navbar */}
       <Navbar />
-    
-    <Banner inProgress={inProgressCount} resolved={resolvedCount} />
 
-    
+      {/* Banner */}
+      <Banner inProgress={inProgressCount} resolved={resolvedCount} />
+
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-8">
@@ -43,16 +97,45 @@ function App() {
               Task Status
             </h2>
 
-    <TicketCard
+            {/* In-Progress */}
+            <div className="space-y-4">
+              {tickets
+                .filter(t => t.status === 'in-progress')
+                .map(ticket => (
+                  <TaskCard
                     key={ticket.id}
                     ticket={ticket}
-                    onClick={() => handleAddToTask(ticket.id)}
+                    onComplete={() => handleComplete(ticket.id)}
                   />
+                ))}
+            </div>
 
-       {/* Footer */}
+            {/* Resolved */}
+            <h3 className="text-2xl font-semibold mt-10 mb-4 text-base-content">
+              Resolved Tasks
+            </h3>
+            <div className="space-y-3">
+              {tickets
+                .filter(t => t.status === 'resolved')
+                .map(ticket => (
+                  <ResolvedCard key={ticket.id} ticket={ticket} />
+                ))}
+              {resolvedCount === 0 && (
+                <p className="text-base-content/70 italic">
+                  No resolved tasks yet.
+                </p>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Footer */}
       <Footer />
-    </>
-  )
+
+    </div>
+  );
 }
 
-export default App
+export default App;
