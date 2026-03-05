@@ -6,7 +6,8 @@ import TicketCard from './components/TicketCard';
 import TaskCard from './components/TaskCard';
 import ResolvedCard from './components/ResolvedCard';
 import Footer from './components/Footer';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [tickets, setTickets] = useState([]);
@@ -134,6 +135,20 @@ function App() {
       {/* Footer */}
       <Footer />
 
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        className="z-[9999]"
+      />
     </div>
   );
 }
